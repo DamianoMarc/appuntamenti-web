@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "Appuntamenti — Prenota online",
+  "short_name": "Appuntamenti",
+  "description": "Prenota e gestisci i tuoi appuntamenti online.",
+  "lang": "it-IT",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f1f3f6",
+  "theme_color": "#3445c4",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

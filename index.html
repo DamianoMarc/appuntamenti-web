@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Appuntamenti — Prenota online</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' http: https:; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self'; manifest-src 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Appuntamenti"><meta name="description" content="Prenota il tuo appuntamento online e gestisci l'agenda della tua attività.">
+<meta name="theme-color" content="#3445c4">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="./" aria-label="Appuntamenti, pagina iniziale">
+    <img class="brand-logo" src="logo.svg" alt="" width="34" height="34">
+    <span>Appuntamenti</span>
+  </a>
+  <nav class="tabs" id="tabs" aria-label="Sezioni principali">
+    <button type="button" data-mode="prenota" aria-current="true">Prenota</button>
+    <button type="button" data-mode="mie" aria-current="false">Le mie prenotazioni <span class="count" id="mieCount" hidden>0</span></button>
+  </nav>
+  <div class="top-right">
+    <span id="status" class="status" title="Stato del backend" hidden><i></i><span>verifico…</span></span>
+    <button class="btn ghost sm install-btn" id="btnInstall" type="button" hidden>Installa app</button>    <button class="btn ghost sm" id="btnAccount" type="button" data-auth="">Accedi</button>
+    <button class="icon-btn" id="btnSettings" type="button" aria-label="Impostazioni" title="Impostazioni" hidden>⚙</button>
+  </div>
+</header>
+
+<main class="shell">
+
+  <!-- ============ PRENOTA ============ -->
+  <section id="viewPrenota">
+    <div class="hero">
+      <h1 id="strutturaTitolo">Prenota in pochi tocchi</h1>
+      <p class="muted" id="strutturaMsg">Scegli servizio e orario. Ricevi subito un codice per gestire o annullare la prenotazione.</p>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h2><span class="step">1</span> Cosa vuoi prenotare</h2>
+          <div class="field" hidden>
+            <label for="cStruttura">Struttura</label>
+            <select id="cStruttura"><option value="">Caricamento…</option></select>
+          </div>
+          <div class="row">
+            <div class="field"><label for="cTipo">Servizio</label><select id="cTipo" disabled><option value="">–</option></select></div>
+            <div class="field"><label for="cRisorsa">Con chi / dove</label><select id="cRisorsa" disabled><option value="">–</option></select></div>
+          </div>
+        </div>
+
+        <div class="card" id="cardGiorno">
+          <h2><span class="step">2</span> Scegli giorno e orario</h2>
+          <div class="datestrip" id="dateStrip" role="group" aria-label="Giorni disponibili"></div>
+          <div class="field datepick">
+            <label for="cData">Oppure scegli un'altra data</label>
+            <input type="date" id="cData">
+          </div>
+          <div id="cSlots" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="sticky-col">
+        <div class="card" id="bookCard">
+          <h2><span class="step">3</span> I tuoi dati</h2>
+          <p class="empty" id="bookEmpty">Scegli un orario per continuare.</p>
+          <form id="bookForm" hidden novalidate>
+            <div class="summary" id="bookSummary"></div>
+            <div class="field"><label for="bNome">Nome e cognome</label><input id="bNome" required autocomplete="name" minlength="2"></div>
+            <div class="row">
+              <div class="field"><label for="bTel">Telefono</label><input id="bTel" type="tel" required autocomplete="tel" inputmode="tel" minlength="6"></div>
+              <div class="field"><label for="bEmail">Email <span class="opt">(facoltativa)</span></label><input id="bEmail" type="email" autocomplete="email"></div>
+            </div>
+            <div class="field"><label for="bNote">Note <span class="opt">(facoltative)</span></label><textarea id="bNote" maxlength="500"></textarea></div>
+            <label class="check"><input type="checkbox" id="bPriv"> <span>Ho letto l'informativa sulla privacy</span></label>
+            <label class="check"><input type="checkbox" id="bTratt"> <span>Acconsento al trattamento dei miei dati per gestire la prenotazione</span></label>
+            <p class="form-err" id="bErr" role="alert" hidden></p>
+            <button class="btn block" id="bSubmit" type="submit">Conferma prenotazione</button>
+          </form>
+          <div id="bookLogin" hidden>
+            <div class="summary" id="bookLoginSummary"></div>
+            <p>Per confermare serve un account: così i tuoi dati sono protetti e puoi gestire i tuoi appuntamenti da qualsiasi dispositivo.</p>
+            <div class="acts"><button class="btn" type="button" data-auth="login">Accedi</button><button class="btn ghost" type="button" data-auth="register">Crea account</button></div>
+          </div>
+          <div id="bookDone" class="done" hidden></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LE MIE PRENOTAZIONI ============ -->
+  <section id="viewMie" hidden>
+    <div class="hero">
+      <h1>Le mie prenotazioni</h1>
+      <p class="muted">Salvate solo su questo dispositivo. Puoi anche annullare con il codice ricevuto.</p>
+    </div>
+    <div class="grid2">
+      <div id="mieList"></div>
+      <div class="card" id="cardCodice">
+        <h3>Annulla con un codice</h3>
+        <p class="small muted">Per prenotazioni fatte da un altro dispositivo. Vale per la struttura selezionata nella pagina «Prenota».</p>
+        <div class="inline-form">
+          <label for="aCodice" class="sr">Codice</label>
+          <input id="aCodice" placeholder="Es. K7M2QX" autocapitalize="characters" spellcheck="false" maxlength="12">
+          <button class="btn danger" id="aBtn" type="button">Annulla</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section id="viewAdmin" hidden>
+    <div class="card login" id="adminLogin">
+      <h2>Accedi alla gestione</h2>
+      <p class="small muted">Usa il codice struttura che ti è stato consegnato.</p>
+      <form id="loginForm">
+        <div class="field"><label for="lCodice">Codice struttura</label><input id="lCodice" required autocomplete="organization" spellcheck="false" autocapitalize="characters"></div>
+        <div class="field"><label for="lUser">Nome utente <span class="opt">(se la struttura ha più accessi)</span></label><input id="lUser" autocomplete="username" spellcheck="false" autocapitalize="none" maxlength="60"></div>
+        <div class="field"><label for="lPass">Password</label><input id="lPass" type="password" required autocomplete="current-password"></div>
+        <button class="btn block" id="loginBtn" type="submit">Accedi</button>
+      </form>
+    </div>
+
+    <div class="admin" id="adminApp" hidden>
+      <nav class="nav" id="nav" aria-label="Sezioni gestione"></nav>
+      <div id="adminMain" class="admin-main"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="bottombar" id="bottombar" aria-label="Navigazione">
+  <button type="button" data-mode="prenota" aria-current="true"><span aria-hidden="true">＋</span>Prenota</button>
+  <button type="button" data-mode="mie" aria-current="false"><span aria-hidden="true">☰</span>Mie</button>
+</nav>
+
+<!-- Area gestione: visibili solo ad admin/staff autenticati (vedi paintShell in app.js) -->
+<nav class="bottombar" id="adminBar" aria-label="Sezioni gestione"></nav>
+<button class="fab" id="fabNew" type="button" hidden aria-label="Nuovo appuntamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Nuovo appuntamento</span></button>
+
+<dialog id="dlgSettings">
+  <form method="dialog" class="dlg">
+    <h3>Impostazioni</h3>
+    <div class="field">
+      <label for="apiUrl">URL del backend</label>
+      <input id="apiUrl" type="url" spellcheck="false" placeholder="http://localhost:8080">
+      <p class="small muted">Vale solo per questo dispositivo. Di default usa il valore in <code>config.js</code>.</p>
+    </div>
+    <label class="check"><input type="checkbox" id="optSound"> <span>Suono quando arriva una nuova prenotazione (gestione)</span></label>
+    <div class="dlg-actions">
+      <button class="btn ghost" value="cancel">Chiudi</button>
+      <button class="btn" id="btnSaveSettings" value="ok">Salva</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgAuth" aria-labelledby="authTitle">
+  <div class="dlg">
+    <div class="auth-head"><h3 id="authTitle">Accedi</h3><button type="button" class="icon-btn" id="authClose" aria-label="Chiudi">✕</button></div>
+    <p class="form-err" id="authErr" role="alert" hidden></p>
+    <p class="form-ok" id="authOk" role="status" hidden></p>
+
+    <form id="paneLogin" data-pane="login" novalidate>
+      <div class="field"><label for="lgEmail">Email</label><input id="lgEmail" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="lgPass">Password</label><input id="lgPass" type="password" autocomplete="current-password" data-pw required></div>
+      <label class="check"><input type="checkbox" data-showpw> <span>Mostra password</span></label>
+      <button class="btn block" id="lgBtn" type="submit">Accedi</button>
+      <p class="auth-links"><button type="button" class="linkbtn" data-goto="forgot">Password dimenticata?</button><button type="button" class="linkbtn" data-goto="register">Crea un account</button></p>
+    </form>
+
+    <form id="paneRegister" data-pane="register" hidden novalidate>
+      <div class="field"><label for="rgNome">Nome e cognome</label><input id="rgNome" autocomplete="name" required></div>
+      <div class="row">
+        <div class="field"><label for="rgEmail">Email</label><input id="rgEmail" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="rgTel">Telefono <span class="opt">(facoltativo)</span></label><input id="rgTel" type="tel" autocomplete="tel" inputmode="tel"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="rgPass">Password</label><input id="rgPass" type="password" autocomplete="new-password" data-pw minlength="10" required></div>
+        <div class="field"><label for="rgPass2">Ripeti password</label><input id="rgPass2" type="password" autocomplete="new-password" data-pw required></div>
+      </div>
+      <p class="small muted" style="margin-top:-4px">Almeno 10 caratteri, con lettere e numeri.</p>
+      <label class="check"><input type="checkbox" data-showpw> <span>Mostra password</span></label>
+      <label class="check"><input type="checkbox" id="rgPriv"> <span>Ho letto l'informativa sulla privacy</span></label>
+      <label class="check"><input type="checkbox" id="rgTratt"> <span>Acconsento al trattamento dei miei dati per gestire le prenotazioni</span></label>
+      <button class="btn block" id="rgBtn" type="submit">Crea account</button>
+      <p class="auth-links"><button type="button" class="linkbtn" data-goto="login">Ho già un account</button></p>
+    </form>
+
+    <form id="paneForgot" data-pane="forgot" hidden novalidate>
+      <p class="muted small">Inserisci la tua email: se è registrata ti inviamo un link per scegliere una nuova password.</p>
+      <div class="field"><label for="fgEmail">Email</label><input id="fgEmail" type="email" autocomplete="email" required></div>
+      <button class="btn block" id="fgBtn" type="submit">Invia link</button>
+      <p class="auth-links"><button type="button" class="linkbtn" data-goto="login">Torna all'accesso</button></p>
+    </form>
+
+    <form id="paneReset" data-pane="reset" hidden novalidate>
+      <div class="field"><label for="rsPass">Nuova password</label><input id="rsPass" type="password" autocomplete="new-password" data-pw minlength="10" required></div>
+      <div class="field"><label for="rsPass2">Ripeti password</label><input id="rsPass2" type="password" autocomplete="new-password" data-pw required></div>
+      <label class="check"><input type="checkbox" data-showpw> <span>Mostra password</span></label>
+      <button class="btn block" id="rsBtn" type="submit">Salva nuova password</button>
+    </form>
+
+    <div id="paneAccount" data-pane="account" hidden>
+      <p><b id="acNome"></b><br><span class="muted" id="acEmail"></span></p>
+      <div class="acts" style="margin-top:12px">
+        <button type="button" class="btn" id="acMie">Le mie prenotazioni</button>
+        <button type="button" class="btn ghost" id="acLogout">Esci</button>
+      </div>
+      <p class="auth-links"><button type="button" class="linkbtn danger-link" id="acDelete">Elimina il mio account</button></p>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dlgConfirm">
+  <form method="dialog" class="dlg">
+    <h3 id="cfTitle">Confermi?</h3>
+    <p id="cfText" class="muted"></p>
+    <div class="dlg-actions">
+      <button class="btn ghost" value="cancel">Indietro</button>
+      <button class="btn danger solid" id="cfOk" value="ok">Conferma</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script><script src="pwa.js"></script>
+</body>
+</html>
